@@ -1,6 +1,8 @@
 #ifndef BLACK_SCHOLES_H
 #define BLACK_SCHOLES_H
 
+// USE FOR EUROPEAN OPTIONS ONLY
+
 // Include necessary libraries
 #include <cmath>
 
