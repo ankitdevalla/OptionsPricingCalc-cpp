@@ -1,8 +1,10 @@
 #include <iostream>
 #include <iomanip>
+#include <string>
 #include "option.h"
 #include "validate.h"
 #include "black-scholes.h"
+#include "binomial-tree.h"
 
 int main() {
 
@@ -12,19 +14,37 @@ int main() {
     double volatility = getPositiveDouble("Enter volatility (as a decimal, 0.2 for 20%): ");
     double interestRate = getPositiveDouble("Enter interest rate (as a decimal, 0.05 for 5%): ");
     double currentPrice = getPositiveDouble("Enter current price of the underlying asset: ");
-    // Option::OptionType optionType = getOptionType();
+    int N = getPositiveInteger("Enter number of steps for binomial tree: ");
+    Option::OptionType optionType = getOptionType();
 
-    // Create an Option object
-    Option option(strikePrice, expiry, volatility, interestRate, currentPrice, Option::OptionType::CALL);
-    double callPrice = blackScholesCall(option.getCurrentPrice(), option.getStrikePrice(), option.getExpiry(),
-                                        option.getInterestRate(), option.getVolatility());
-    double putPrice = blackScholesPut(option.getCurrentPrice(), option.getStrikePrice(), option.getExpiry(), 
-                                      option.getInterestRate(), option.getVolatility());
+    // Create an Option object -- black-scholes
+    // Option option(strikePrice, expiry, volatility, interestRate, currentPrice, Option::OptionType::CALL);
+    // double callPrice = blackScholesCall(option.getCurrentPrice(), option.getStrikePrice(), option.getExpiry(),
+    //                                     option.getInterestRate(), option.getVolatility());
+    // double putPrice = blackScholesPut(option.getCurrentPrice(), option.getStrikePrice(), option.getExpiry(), 
+    //                                   option.getInterestRate(), option.getVolatility());
 
-    // Display the option parameters
-    std::cout << std::fixed << std::setprecision(2);
-    std::cout << "Call Option Price: $" << callPrice << std::endl;
-    std::cout << "Put Option Price: $" << putPrice << std::endl;
+    // Display the option prices -- black-scholes
+    // std::cout << std::fixed << std::setprecision(2);
+    // std::cout << "Call Option Price: $" << callPrice << std::endl;
+    // std::cout << "Put Option Price: $" << putPrice << std::endl;
+
+    // Calculate parameters for the binomial model
+    double deltaT = getDeltaT(expiry, N);
+    double u = getUpFactor(volatility, deltaT);
+    double d = getDownFactor(u);
+    double p = (std::exp(interestRate * deltaT) - d) / (u - d);
+
+    // Calculate option prices at maturity
+    std::vector<double> optionPricesAtMaturity = calculateOptionValuesAtMaturity(currentPrice, strikePrice, u, d, N, Option::OptionType::CALL);
+
+    // Calculate the option price at time 0
+    double optionPrice = stepBackwardThroughTree(optionPricesAtMaturity, p, interestRate, deltaT, currentPrice, strikePrice, u, d, N, Option::OptionType::CALL, false);
+
+    // Display the option price
+    std::cout << "Up State: " << u << std::endl;
+    std::cout << "Down State: " << d << std::endl;
+    std::cout << "Option Price: $" << optionPrice << std::endl;
 
     return 0;
 }

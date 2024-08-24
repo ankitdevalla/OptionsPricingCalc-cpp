@@ -20,6 +20,24 @@ double getPositiveDouble(const std::string& prompt) {
     }
 }
 
+int getPositiveInteger(const std::string& prompt) {
+    int val;
+    while (true) {
+        std::cout << prompt;
+        std::cin >> val;
+
+        // Check for invalid input
+        if (std::cin.fail() || val <= 0 || val != static_cast<int>(val)) {
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore bad input
+            std::cout << "Invalid input. Please enter a positive integer." << std::endl;
+        } else {
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // ignore any extra input
+            return val;
+        }
+    }
+}
+
 Option::OptionType getOptionType() {
     int choice;
     while (true) {
