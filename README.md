@@ -1,1 +1,3 @@
 # OptionsPricingCalc-cpp
+
+Options prices can be calculated in 2 very popular ways, depending on the type (European or American). We use the Black-Scholes Formula (Black-Scholes-Merton) to price European call options as this formula does not configure for exercising options whenever the trader wants, like American options. To price American options, we use the Binomial Tree Model, which values options by simulating possible ways the underlying stock price could change over the life of the option.
